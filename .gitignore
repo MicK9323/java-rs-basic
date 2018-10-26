@@ -12,5 +12,9 @@ buildNumber.properties
 !/.mvn/wrapper/maven-wrapper.jar
 /.metadata/
 .metadata/
+/.metadata/*
+.metadata/*
 /.recommenders/
 .recommenders/
+/.recommenders/*
+.recommenders/*
