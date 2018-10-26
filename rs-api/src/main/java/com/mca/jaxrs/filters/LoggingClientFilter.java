@@ -32,11 +32,20 @@ public class LoggingClientFilter implements ClientRequestFilter, ClientResponseF
 
 	@Override
 	public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		sb.append(" - Header: ").append(responseContext.getHeaders());
+		sb.append(" - Entity: ").append(getEntityBody(responseContext));
+		LOG.info("HTTP RESPONSE=[{}]", sb.toString());
+	}
+
+	private String getEntityBody(ClientResponseContext responseContext) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		InputStream in = responseContext.getEntityStream();
+
 		final StringBuilder b = new StringBuilder();
 		try {
 			writeTo(in, out);
+
 			byte[] requestEntity = out.toByteArray();
 			if (requestEntity.length == 0) {
 				b.append("").append("\n");
@@ -44,33 +53,12 @@ public class LoggingClientFilter implements ClientRequestFilter, ClientResponseF
 				b.append(new String(requestEntity)).append("\n");
 			}
 			responseContext.setEntityStream(new ByteArrayInputStream(requestEntity));
-		} catch (IOException ex) {
-			LOG.error("Error al parsear el entity", ex);
-		}
-	}
 
-//	@SuppressWarnings("unused")
-//	private String getEntityBody(ClientResponseContext responseContext) {
-//		ByteArrayOutputStream out = new ByteArrayOutputStream();
-//		InputStream in = responseContext.getEntityStream();
-//
-//		final StringBuilder b = new StringBuilder();
-//		try {
-//			writeTo(in, out);
-//
-//			byte[] requestEntity = out.toByteArray();
-//			if (requestEntity.length == 0) {
-//				b.append("").append("\n");
-//			} else {
-//				b.append(new String(requestEntity)).append("\n");
-//			}
-//			responseContext.setEntityStream(new ByteArrayInputStream(requestEntity));
-//
-//		} catch (IOException ex) {
-//			// Handle logging error
-//		}
-//		return b.toString();
-//	}
+		} catch (IOException ex) {
+			// Handle logging error
+		}
+		return b.toString();
+	}
 
 	private static void writeTo(InputStream in, OutputStream out) throws IOException {
 		int read;
